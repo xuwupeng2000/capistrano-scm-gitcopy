@@ -1,9 +1,11 @@
-capistrano-scm-copy
+capistrano-scm-gitcopy
 ===================
 
 A copy strategy for Capistrano 3, which mimics the `:copy` scm of Capistrano 2.
+This Gem is inspired by and based on https://github.com/wercker/capistrano-scm-copy.
+Thank wercker so much.
 
-This will make Capistrano tar the current directory, upload it to the server(s) and then extract it in the release directory.
+This will make Capistrano tar the a specific branch, upload it to the server(s) and then extract it in the release directory.
 
 Requirements
 ============
@@ -21,36 +23,14 @@ Servers:
 Installation
 ============
 
-First make sure you install the capistrano-scm-copy by adding it to your `Gemfile`:
+First make sure you install the capistrano-scm-gitcopy by adding it to your `Gemfile`:
 
-    gem "capistrano-scm-copy"
+    gem "capistrano-scm-gitcopy"
 
-Then switch the `:scm` option to `:copy` in `config/deploy.rb`:
+Then switch the `:scm` option to `:gitcopy` in `config/deploy.rb`:
 
-    set :scm, :copy
+    set :scm, :gitcopy
     
-TODO
-====
-
-I'm new to programming for Capistrano and even Ruby in general. So any feedback is appreciated. 
-
-License
-=======
-
-The MIT License (MIT)
-
-Changelog
-=========
-
-0.1.0
------
-
-- Add `:include_dir`
-
-0.0.2
------
-
-- Add `task :set_current_revision` 
 
 0.0.1
 -----
