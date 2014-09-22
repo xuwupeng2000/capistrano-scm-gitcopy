@@ -1,1 +1,1 @@
-load File.expand_path('../tasks/copy.rake', __FILE__)
+load File.expand_path('../tasks/gitcopy.rake', __FILE__)
