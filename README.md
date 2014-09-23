@@ -1,4 +1,4 @@
-capistrano-scm-gitcopy
+[ capistrano-scm-gitcopy ](https://github.com/xuwupeng2000/capsitrano-scm-gitcopy)
 ===================
 
 Capistrano 3 :copy 
