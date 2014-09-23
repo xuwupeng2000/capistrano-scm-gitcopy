@@ -1,8 +1,6 @@
 namespace :gitcopy do
 
   archive_name =  "archive.#{ DateTime.now.strftime('%Y%m%d%m%s') }.tar.gz" 
-  include_dir  = fetch(:include_dir) || "*"
-  exclude_dir  = fetch(:exclude_dir) || ""
 
   # Deploy specific branch in the following way: 
   # $ cap deploy -s branch=<the branch you want to deploy>
