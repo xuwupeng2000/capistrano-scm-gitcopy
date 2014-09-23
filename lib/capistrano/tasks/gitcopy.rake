@@ -1,6 +1,7 @@
 namespace :gitcopy do
 
-  archive_name = "archive.tar.gz"
+  tmp_folder_name = "tarball_archives"
+  archive_name =  "archive.#{ DateTime.now.strftime('%Y%m%d%m%s') }.tar.gz" 
   include_dir  = fetch(:include_dir) || "*"
   exclude_dir  = fetch(:exclude_dir) || ""
 
@@ -11,14 +12,8 @@ namespace :gitcopy do
   desc "Archive files to #{archive_name}"
   task :tar_release_branch do 
     run_locally do
-      execute "mkdir -p ~/tmp"
-      temporary_folder_name = execute "mktemp -u" 
-      execute "git clone #{fetch(:repo_url)} --branch #{release_branch} --single-branch ~/#{temporary_folder_name.to_s}"
-      execute "cd ~/tmp/temporary_folder_name"
-
-      file archive_name => FileList[include_dir].exclude(archive_name) do |t|
-        execute "tar -cvzf #{t.name} #{t.prerequisites.join(" ")}" + (exclude_dir.empty? ? "" : " --exclude #{exclude_dir}")
-      end
+      execute "mkdir -p #{tmp_folder_name} "
+      file archive_name => execute "git archive #{ fetch(:branch) } --format tar.gz --output #{ tmp_folder_name }/#{ archive_name }"
     end
   end
 
