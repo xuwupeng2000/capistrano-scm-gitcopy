@@ -1,6 +1,5 @@
 namespace :gitcopy do
 
-  tmp_folder_name = "tarball_archives"
   archive_name =  "archive.#{ DateTime.now.strftime('%Y%m%d%m%s') }.tar.gz" 
   include_dir  = fetch(:include_dir) || "*"
   exclude_dir  = fetch(:exclude_dir) || ""
@@ -10,18 +9,14 @@ namespace :gitcopy do
   release_branch = ENV["branch"] || "master"
 
   desc "Archive files to #{archive_name}"
-  task :tar_release_branch do 
-    run_locally do
-      execute "mkdir -p #{tmp_folder_name} "
-      file archive_name => execute "git archive #{ fetch(:branch) } --format tar.gz --output #{ tmp_folder_name }/#{ archive_name }"
-    end
+  file archive_name do |file| 
+    system "git archive #{ fetch(:branch) } --format tar.gz --output #{ archive_name }"
   end
 
   desc "Deploy #{archive_name} to release_path"
-  task :deploy => archive_name do |t|
-    tarball = t.prerequisites.first
+  task :deploy => archive_name do |file|
+    tarball = file.prerequisites.first
     on roles :all do
-
       # Make sure the release directory exists
       execute :mkdir, "-p", release_path
 
@@ -34,7 +29,7 @@ namespace :gitcopy do
       execute :rm, tmp_file
     end
 
-    Rake::Task["copy:clean"].invoke
+    Rake::Task["gitcopy:clean"].invoke
   end
 
   task :clean do |t|
