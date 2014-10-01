@@ -8,7 +8,13 @@ namespace :gitcopy do
 
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
-    "git archive #{ fetch(:branch) } --format=tar | gzip > #{ archive_name }"
+    # on 2nd october morning, found that the format at the rear 
+    # is preventing git archive from creating the archive
+    # tried to add the format parameter in the front. 
+    # if this is still not working, then we should use the 2nd line 
+    # that I have created that does not use capistrano fetch
+    system "git archive --format=tar #{ fetch(:branch) } | gzip > #{ archive_name }"
+    #system "git archive --format=tar #{ release_branch } | gzip > #{ archive_name }"
   end
 
   desc "Deploy #{archive_name} to release_path"
