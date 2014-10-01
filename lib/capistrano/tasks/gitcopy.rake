@@ -8,7 +8,7 @@ namespace :gitcopy do
 
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
-    system "git archive #{ fetch(:branch) } --format tar.gz --output #{ archive_name }"
+    system "git archive --format=tar #{ fetch(:branch) } | gzip > #{ archive_name }"
   end
 
   desc "Deploy #{archive_name} to release_path"
