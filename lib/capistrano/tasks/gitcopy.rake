@@ -26,14 +26,15 @@ namespace :gitcopy do
       execute :tar, "-xzf", tmp_file, "-C", release_path
       execute :rm, tmp_file
     end
-
-    Rake::Task["gitcopy:clean"].invoke
   end
+
 
   task :clean do |t|
     # Delete the local archive
     File.delete archive_name if File.exists? archive_name
   end
+  after 'deploy:finished', 'gitcopy:clean'
+
 
   task :create_release => :deploy
 
