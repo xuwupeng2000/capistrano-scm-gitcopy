@@ -8,7 +8,12 @@ namespace :gitcopy do
 
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
-    system "git archive --format=tar #{ fetch(:branch) } | gzip > #{ archive_name }"
+    system "git show --quiet #{fetch(:branch)}"
+    if $?.exitstatus == 0
+      system "git archive --format=tar #{fetch(:branch)} | gzip > #{ archive_name }"
+    else
+      puts "Can't find commit for: #{fetch(:branch)}"
+    end
   end
 
   desc "Deploy #{archive_name} to release_path"
