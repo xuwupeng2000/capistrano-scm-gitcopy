@@ -8,13 +8,7 @@ namespace :gitcopy do
 
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
-    # on 2nd october morning, found that the format at the rear 
-    # is preventing git archive from creating the archive
-    # tried to add the format parameter in the front. 
-    # if this is still not working, then we should use the 2nd line 
-    # that I have created that does not use capistrano fetch
     system "git archive --format=tar #{ fetch(:branch) } | gzip > #{ archive_name }"
-    #system "git archive --format=tar #{ release_branch } | gzip > #{ archive_name }"
   end
 
   desc "Deploy #{archive_name} to release_path"
@@ -32,14 +26,15 @@ namespace :gitcopy do
       execute :tar, "-xzf", tmp_file, "-C", release_path
       execute :rm, tmp_file
     end
-
-    Rake::Task["gitcopy:clean"].invoke
   end
+
 
   task :clean do |t|
     # Delete the local archive
     File.delete archive_name if File.exists? archive_name
   end
+  after 'deploy:finished', 'gitcopy:clean'
+
 
   task :create_release => :deploy
 
