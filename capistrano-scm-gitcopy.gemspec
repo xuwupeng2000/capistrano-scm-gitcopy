@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "capistrano-scm-gitcopy"
-  s.version     = "0.0.5"
+  s.version     = "0.0.6"
   s.licenses    = ["MIT"]
   s.authors     = ["Jack Wu"]
   s.email       = ["xuwupeng2000@gmail.com"]
