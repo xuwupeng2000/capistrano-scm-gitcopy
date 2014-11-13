@@ -4,9 +4,9 @@ namespace :gitcopy do
 
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
-    system "git show --quiet #{fetch(:branch)}"
+    system "git ls-remote #{fetch(:repo_url)} | grep #{fetch(:branch)}"
     if $?.exitstatus == 0
-      system "git archive --format=tar #{fetch(:branch)} | gzip > #{ archive_name }"
+      system "git archive --remote #{fetch(:repo_url)} --format=tar #{fetch(:branch)} | gzip > #{ archive_name }"
     else
       puts "Can't find commit for: #{fetch(:branch)}"
     end
