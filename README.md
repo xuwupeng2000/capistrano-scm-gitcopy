@@ -1,3 +1,6 @@
+This fork adds the `sub_directory` option. When specified, onthe the subtree of the checked-out repository will be deployed. This is useful when the rails application is not at the root of the repository.
+
+
 [ capistrano-scm-gitcopy ](https://github.com/xuwupeng2000/capsitrano-scm-gitcopy)
 ===================
 
