@@ -1,6 +1,3 @@
-This fork adds the `sub_directory` option. When specified, onthe the subtree of the checked-out repository will be deployed. This is useful when the rails application is not at the root of the repository.
-
-
 [ capistrano-scm-gitcopy ](https://github.com/xuwupeng2000/capsitrano-scm-gitcopy)
 ===================
 
@@ -11,6 +8,10 @@ This Gem is inspired by and based on https://github.com/wercker/capistrano-scm-c
 Thank wercker so much.
 
 This will make Capistrano tar the a specific git branch, upload it to the server(s) and then extract it in the release directory.
+
+There is `sub_directory` option. 
+When specified, onthe the subtree of the checked-out repository will be deployed. 
+This is useful when the rails application is not at the root of the repository.
 
 Requirements
 ============
