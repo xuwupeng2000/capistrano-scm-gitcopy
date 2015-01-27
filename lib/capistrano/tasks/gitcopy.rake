@@ -19,7 +19,7 @@ namespace :gitcopy do
   end
 
   desc "Deploy #{archive_name} to release_path"
-  task deploy: archive_name do |file|
+  task :deploy => archive_name do |file|
     tarball = file.prerequisites.first
     on roles :all do
       # Make sure the release directory exists
