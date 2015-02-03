@@ -41,7 +41,7 @@ namespace :gitcopy do
   end
   after 'deploy:finished', 'gitcopy:clean'
 
-  task create_release: :deploy
+  task :create_release => :deploy
 
   task :check
 
