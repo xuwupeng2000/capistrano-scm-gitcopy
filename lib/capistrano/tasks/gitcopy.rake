@@ -8,7 +8,7 @@ namespace :gitcopy do
 
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
-    system "git show #{fetch(:branch)}"
+    system "git show #{fetch(:branch)} > /dev/null"
     if $?.exitstatus == 0
       system "git archive --format=tar #{fetch(:branch)} | gzip > #{ archive_name }"
     else
