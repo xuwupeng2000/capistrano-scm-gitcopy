@@ -2,10 +2,6 @@ namespace :gitcopy do
 
   archive_name =  "archive.#{ DateTime.now.strftime('%Y%m%d%m%s') }.tar.gz" 
 
-  # Deploy specific branch in the following way: 
-  # $ cap deploy -s branch=<the branch you want to deploy>
-  release_branch = ENV["branch"] || "master"
-
   desc "Archive files to #{archive_name}"
   file archive_name do |file| 
     system "git show #{fetch(:branch)} > /dev/null"
