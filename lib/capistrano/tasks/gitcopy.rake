@@ -26,7 +26,7 @@ namespace :gitcopy do
       execute :mkdir, '-p', release_path
 
       # Create a temporary file on the server
-      tmp_file = capture 'mktemp'
+      tmp_file = capture %Q(ruby -rtempfile -e 'Tempfile.open("capistrano-"){|f|puts f.path}')
 
       # Upload the archive, extract it and finally remove the tmp_file
       upload! tarball, tmp_file
