@@ -9,6 +9,10 @@ Thank wercker so much.
 
 This will make Capistrano tar the a specific git branch, upload it to the server(s) and then extract it in the release directory.
 
+There is `sub_directory` option. 
+When specified, onthe the subtree of the checked-out repository will be deployed. 
+This is useful when the rails application is not at the root of the repository.
+
 Requirements
 ============
 
