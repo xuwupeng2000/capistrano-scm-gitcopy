@@ -37,6 +37,8 @@ Then switch the `:scm` option to `:gitcopy` in `config/deploy.rb`:
 
     set :scm, :gitcopy
     
+Then add `require 'capistrano/gitcopy'` to `Capfile`
+    
 
 Usage
 ============
