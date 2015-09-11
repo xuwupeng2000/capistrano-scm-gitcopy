@@ -25,6 +25,7 @@ Servers:
 
 - mktemp
 - tar
+- ruby
 
 Installation
 ============
