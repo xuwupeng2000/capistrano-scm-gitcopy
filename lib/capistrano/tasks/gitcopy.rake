@@ -15,7 +15,7 @@ namespace :gitcopy do
 
     if matches.lines.count == 1
       system "git archive #{no_repo_url ? '' : "--remote #{fetch(:repo_url)}" } --format=tar #{fetch(:branch)}:#{fetch(:sub_directory)} | gzip > #{ archive_name }"
-      set :current_revision, `git rev-list --max-count=1 --abbrev-commit #{fetch(:branch)}`.chomp('')
+      set :current_revision, matches.lines.first.split("\t")[0]
     elsif matches.lines.count == 0
       puts "Can't find reference for: #{fetch(:branch)}"
     else
