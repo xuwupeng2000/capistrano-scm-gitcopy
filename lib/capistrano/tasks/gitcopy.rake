@@ -14,6 +14,7 @@ namespace :gitcopy do
     matches = `git ls-remote #{no_repo_url ? local_git_dir : fetch(:repo_url)} | grep -P '^.{40}\t.*#{fetch(:branch)}$'`
 
     if matches.lines.count == 1
+      puts "Making #{archive_name} archive..."
       system "git archive #{no_repo_url ? '' : "--remote #{fetch(:repo_url)}" } --format=tar #{fetch(:branch)}:#{fetch(:sub_directory)} | gzip > #{ archive_name }"
       set :current_revision, matches.lines.first.split("\t")[0]
     elsif matches.lines.count == 0
