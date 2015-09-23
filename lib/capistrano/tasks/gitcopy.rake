@@ -5,18 +5,29 @@ namespace :gitcopy do
   file archive_name do |file|
     no_repo_url = fetch(:repo_url) !~ /\S/
 
-    if no_repo_url
-      system "git ls-tree #{fetch(:branch)} > /dev/null"
-    else
-      system "git ls-remote #{fetch(:repo_url)} | grep #{fetch(:branch)}"
+    local_git_dir = `git rev-parse --git-dir > /dev/null 2>&1`
+
+    if no_repo_url && $?.exitstatus != 0
+      raise 'Neither a remote repository has been given nor the current directory is a git repository. Aborting...'
     end
 
-    if $?.exitstatus == 0
+    matches = `git ls-remote #{no_repo_url ? local_git_dir : fetch(:repo_url)} | grep -P '^.{40}\t.*#{fetch(:branch)}$'`
+
+    if matches.lines.count == 1
+      puts "Making #{archive_name} archive..."
       system "git archive #{no_repo_url ? '' : "--remote #{fetch(:repo_url)}" } --format=tar #{fetch(:branch)}:#{fetch(:sub_directory)} | gzip > #{ archive_name }"
-      set :current_revision, `git rev-list --max-count=1 --abbrev-commit #{fetch(:branch)}`.chomp('')
+      set :current_revision, matches.lines.first.split("\t")[0]
+    elsif matches.lines.count == 0
+      puts "Can't find reference for: #{fetch(:branch)}"
     else
-      puts "Can't find commit for: #{fetch(:branch)}"
+      puts "Multiple references found matching \"#{fetch(:branch)}\":"
+      matches.lines.each do |line|
+        puts "    #{line.split("\t")[1]}"
+      end
+      puts "Please set :branch variable with an exact reference (like #{matches.lines.first.split("\t")[1].chomp} instead of #{fetch(:branch)})."
     end
+    # We stop here if we couldn't find a correct reference
+    raise if matches.lines.count != 1
   end
 
   desc "Deploy #{archive_name} to release_path"
