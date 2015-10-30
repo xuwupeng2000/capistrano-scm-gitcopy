@@ -11,7 +11,7 @@ namespace :gitcopy do
     }
   }
 
-  desc 'Upload the git wrapper script, this script guarantees that we can script git without getting an interactive prompt'
+  desc 'Generate the git wrapper script, this script guarantees that we can script git without getting an interactive prompt'
   task :wrapper do
     run_locally do
       execute :mkdir, "-p", "#{fetch(:tmp_dir)}/#{fetch(:application)}/"
@@ -23,7 +23,7 @@ namespace :gitcopy do
   end
 
   desc 'Check that the repository is reachable'
-  task check: :'gitcopy:wrapper' do
+  task :check => :'gitcopy:wrapper' do
     fetch(:branch)
     run_locally do
       with fetch(:git_environmental_variables) do
@@ -33,7 +33,7 @@ namespace :gitcopy do
   end
 
   desc 'Clone the repo to the cache'
-  task clone: :'gitcopy:wrapper' do
+  task :clone => :'gitcopy:wrapper' do
     run_locally do
       execute :mkdir, '-p', repo_path
       if strategy.test
@@ -49,7 +49,7 @@ namespace :gitcopy do
   end
 
   desc 'Update the repo mirror to reflect the origin state'
-  task update: :'gitcopy:clone' do
+  task :update => :'gitcopy:clone' do
     run_locally do
       within repo_path do
         with fetch(:git_environmental_variables) do
@@ -60,7 +60,7 @@ namespace :gitcopy do
   end
 
   desc 'Create tarfile'
-  task create_tarfile: [:'gitcopy:update', :'gitcopy:set_current_revision'] do
+  task :create_tarfile => [:'gitcopy:update', :'gitcopy:set_current_revision'] do
     run_locally do
       within repo_path do
         with fetch(:git_environmental_variables) do
@@ -71,7 +71,7 @@ namespace :gitcopy do
   end
 
   desc 'Copy repo to releases'
-  task create_release: :'gitcopy:create_tarfile' do
+  task :create_release => :'gitcopy:create_tarfile' do
 
     on release_roles :all do
       within deploy_to do
