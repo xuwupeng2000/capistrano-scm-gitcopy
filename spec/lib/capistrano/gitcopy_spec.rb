@@ -42,7 +42,7 @@ module Capistrano
         context.expects(:fetch).with(:git_shallow_clone).returns(nil)
         context.expects(:repo_url).returns(:url)
         context.expects(:repo_path).returns(:path)
-        context.expects(:execute).with(:git, :clone, '--mirror', :url, :path)
+        context.expects(:execute).with(:git, :clone, '--verbose', '--mirror', :url, :path)
 
         subject.clone
       end
@@ -52,7 +52,7 @@ module Capistrano
         context.expects(:repo_url).returns(:url)
         context.expects(:repo_path).returns(:path)
 
-        context.expects(:execute).with(:git, :clone, '--mirror', "--depth", '1', '--no-single-branch', :url, :path)
+        context.expects(:execute).with(:git, :clone, '--verbose', '--mirror', "--depth", '1', '--no-single-branch', :url, :path)
 
         subject.clone
       end
@@ -81,7 +81,9 @@ module Capistrano
         context.expects(:fetch).with(:branch).returns(:branch)
         context.expects(:release_path).returns(:path)
 
-        context.expects(:execute).with(:git, :archive, :branch, '| tar -x -f - -C', :path)
+        context.expects(:local_tarfile).returns('/tmp/rspec-test-ABCDEF.tar.gz')
+
+        context.expects(:execute).with(:git, :archive, :branch, "|gzip > /tmp/rspec-test-ABCDEF.tar.gz")
 
         subject.release
       end
@@ -91,7 +93,9 @@ module Capistrano
         context.expects(:fetch).with(:branch).returns(:branch)
         context.expects(:release_path).returns(:path)
 
-        context.expects(:execute).with(:git, :archive, :branch, 'tree', '| tar -x --strip-components 1 -f - -C', :path)
+        context.expects(:local_tarfile).returns('/tmp/rspec-test-ABCDEF.tar.gz')
+
+        context.expects(:execute).with(:git, :archive, :branch, 'tree', "|gzip > /tmp/rspec-test-ABCDEF.tar.gz")
 
         subject.release
       end
