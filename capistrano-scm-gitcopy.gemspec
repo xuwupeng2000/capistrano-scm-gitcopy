@@ -3,7 +3,7 @@ $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'capistrano-scm-gitcopy'
-  s.version     = '0.0.10'
+  s.version     = '0.1.0'
   s.licenses    = ['MIT']
   s.authors     = ['Jack Wu', 'Carl Douglas']
   s.email       = ['xuwupeng2000@gmail.com']
@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'capistrano', '~> 3.0'
 
   s.add_development_dependency 'rspec', '~> 3.0.0'
-  s.add_development_dependency 'mocha'
+  s.add_development_dependency 'mocha', '~> 1.1.0'
 end
