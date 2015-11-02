@@ -1,61 +1,100 @@
 namespace :gitcopy do
-  archive_name =  "archive.#{ DateTime.now.strftime('%Y%m%d%m%s') }.tar.gz"
 
-  desc "Archive files to #{archive_name}"
-  file archive_name do |file|
-    no_repo_url = fetch(:repo_url) !~ /\S/
+  def strategy
+    @strategy ||= Capistrano::GitCopy.new(self, fetch(:git_strategy, Capistrano::GitCopy::DefaultStrategy))
+  end
 
-    local_git_dir = `git rev-parse --git-dir > /dev/null 2>&1`
+  set :git_environmental_variables, ->() {
+    {
+      git_askpass: "/bin/echo",
+      git_ssh:     "#{fetch(:tmp_dir)}/#{fetch(:application)}/git-ssh.sh"
+    }
+  }
 
-    if no_repo_url && $?.exitstatus != 0
-      raise 'Neither a remote repository has been given nor the current directory is a git repository. Aborting...'
-    end
-
-    matches = `git ls-remote #{no_repo_url ? local_git_dir : fetch(:repo_url)} | grep -P '^.{40}\t.*#{fetch(:branch)}$'`
-
-    if matches.lines.count == 1
-      puts "Making #{archive_name} archive..."
-      system "git archive #{no_repo_url ? '' : "--remote #{fetch(:repo_url)}" } --format=tar #{fetch(:branch)}:#{fetch(:sub_directory)} | gzip > #{ archive_name }"
-      set :current_revision, matches.lines.first.split("\t")[0]
-    elsif matches.lines.count == 0
-      puts "Can't find reference for: #{fetch(:branch)}"
-    else
-      puts "Multiple references found matching \"#{fetch(:branch)}\":"
-      matches.lines.each do |line|
-        puts "    #{line.split("\t")[1]}"
+  desc 'Upload the git wrapper script, this script guarantees that we can script git without getting an interactive prompt'
+  task :wrapper do
+    run_locally do
+      execute :mkdir, "-p", "#{fetch(:tmp_dir)}/#{fetch(:application)}/"
+      File.open("#{fetch(:tmp_dir)}/#{fetch(:application)}/git-ssh.sh", "w") do |file|
+        file.write ("#!/bin/sh -e\nexec /usr/bin/ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no \"$@\"\n")
       end
-      puts "Please set :branch variable with an exact reference (like #{matches.lines.first.split("\t")[1].chomp} instead of #{fetch(:branch)})."
-    end
-    # We stop here if we couldn't find a correct reference
-    raise if matches.lines.count != 1
-  end
-
-  desc "Deploy #{archive_name} to release_path"
-  task :deploy => archive_name do |file|
-    tarball = file.prerequisites.first
-    on roles :all do
-      # Make sure the release directory exists
-      execute :mkdir, '-p', release_path
-
-      # Create a temporary file on the server
-      tmp_file = execute :ruby, %Q(-rtempfile -e 'Tempfile.open("capistrano-") { |f| puts f.path }')
-
-      # Upload the archive, extract it and finally remove the tmp_file
-      upload! tarball, tmp_file
-      execute :tar, '-xzf', tmp_file, '-C', release_path
-      execute :rm, tmp_file
+      execute :chmod, "+x", "#{fetch(:tmp_dir)}/#{fetch(:application)}/git-ssh.sh"
     end
   end
 
-  task :clean do |t|
-    # Delete the local archive
-    File.delete archive_name if File.exists? archive_name
+  desc 'Check that the repository is reachable'
+  task check: :'gitcopy:wrapper' do
+    fetch(:branch)
+    run_locally do
+      with fetch(:git_environmental_variables) do
+        strategy.check
+      end
+    end
   end
-  after 'deploy:finished', 'gitcopy:clean'
 
-  task :create_release => :deploy
+  desc 'Clone the repo to the cache'
+  task clone: :'gitcopy:wrapper' do
+    run_locally do
+      execute :mkdir, '-p', repo_path
+      if strategy.test
+        info t(:mirror_exists, at: repo_path)
+      else
+        within repo_path do
+          with fetch(:git_environmental_variables) do
+            strategy.clone
+          end
+        end
+      end
+    end
+  end
 
-  task :check
+  desc 'Update the repo mirror to reflect the origin state'
+  task update: :'gitcopy:clone' do
+    run_locally do
+      within repo_path do
+        with fetch(:git_environmental_variables) do
+          strategy.update
+        end
+      end
+    end
+  end
 
-  task :set_current_revision
+  desc 'Create tarfile'
+  task create_tarfile: [:'gitcopy:update', :'gitcopy:set_current_revision'] do
+    run_locally do
+      within repo_path do
+        with fetch(:git_environmental_variables) do
+          strategy.release
+        end
+      end
+    end
+  end
+
+  desc 'Copy repo to releases'
+  task create_release: :'gitcopy:create_tarfile' do
+
+    on release_roles :all do
+      within deploy_to do
+        execute :mkdir, '-p', release_path
+        upload! strategy.local_tarfile, strategy.remote_tarfile
+        execute :tar, '--extract --verbose --file', strategy.remote_tarfile, '--directory', release_path
+        execute :rm, strategy.remote_tarfile
+      end
+    end
+
+    run_locally do
+      if File.exists? strategy.local_tarfile
+        execute :rm, strategy.local_tarfile
+      end
+    end
+  end
+
+  desc 'Determine the revision that will be deployed'
+  task :set_current_revision do
+    run_locally do
+      with fetch(:git_environmental_variables) do
+        set :current_revision, strategy.fetch_revision
+      end
+    end
+  end
 end
