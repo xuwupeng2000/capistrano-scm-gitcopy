@@ -79,11 +79,11 @@ module Capistrano
       it "should run git archive without a subtree" do
         context.expects(:fetch).with(:repo_tree).returns(nil)
         context.expects(:fetch).with(:branch).returns(:branch)
-        context.expects(:release_path).returns(:path)
+        context.expects(:fetch).with(:tmp_dir).returns('/tmp')
+        context.expects(:fetch).with(:application).returns('rspec-test')
+        context.expects(:fetch).with(:current_revision).returns('ABCDEF')
 
-        context.expects(:local_tarfile).returns('/tmp/rspec-test-ABCDEF.tar.gz')
-
-        context.expects(:execute).with(:git, :archive, :branch, "|gzip > /tmp/rspec-test-ABCDEF.tar.gz")
+        context.expects(:execute).with(:git, :archive, :branch, '--format', 'tar', "|gzip > /tmp/rspec-test-ABCDEF.tar.gz")
 
         subject.release
       end
@@ -91,11 +91,11 @@ module Capistrano
       it "should run git archive with a subtree" do
         context.expects(:fetch).with(:repo_tree).returns('tree')
         context.expects(:fetch).with(:branch).returns(:branch)
-        context.expects(:release_path).returns(:path)
+        context.expects(:fetch).with(:tmp_dir).returns('/tmp')
+        context.expects(:fetch).with(:application).returns('rspec-test')
+        context.expects(:fetch).with(:current_revision).returns('ABCDEF')
 
-        context.expects(:local_tarfile).returns('/tmp/rspec-test-ABCDEF.tar.gz')
-
-        context.expects(:execute).with(:git, :archive, :branch, 'tree', "|gzip > /tmp/rspec-test-ABCDEF.tar.gz")
+        context.expects(:execute).with(:git, :archive, :branch, 'tree', '--format', 'tar', "|gzip > /tmp/rspec-test-ABCDEF.tar.gz")
 
         subject.release
       end
