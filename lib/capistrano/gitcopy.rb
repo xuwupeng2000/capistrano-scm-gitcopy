@@ -49,7 +49,11 @@ class Capistrano::GitCopy < Capistrano::SCM
     end
 
     def remote_tarfile
+      if (remote_tmp_dir = fetch(:remote_tmp_dir))
+      "#{fetch(:remote_tmp_dir)}/#{fetch(:application)}-#{fetch(:current_revision).strip}.tar.gz"
+      else
       "#{fetch(:tmp_dir)}/#{fetch(:application)}-#{fetch(:current_revision).strip}.tar.gz"
+      end
     end
 
     def release
