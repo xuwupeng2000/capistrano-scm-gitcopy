@@ -12,8 +12,8 @@ This will make Capistrano tar the a specific git branch, upload it to the server
 Release notes
 ============
 0.1.4
-- I have not update this gem for a while but I am back now
-- New local tmp folder (/tmp/application-name/timestamp) so you can deploy without worry about clear up
+- Tidy up
+- New local tmp folder (/tmp/application-name/timestamp) so you can deploy without worry about clearup
 - Remove incorrect README content
 
 Requirements
