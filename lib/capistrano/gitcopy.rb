@@ -2,8 +2,7 @@ load File.expand_path('../tasks/gitcopy.rake', __FILE__)
 
 require 'capistrano/scm'
 
-set_if_empty :repo_path, -> { "/tmp/#{fetch(:application)}-repository" }
-set_if_empty :local_path, -> { "~/tmp/#{fetch(:application)}-repository/#{Time.now.to_i}" }
+set_if_empty :local_path, -> { "/tmp/#{fetch(:application)}-repository/#{Time.now.to_i}" }
 
 class Capistrano::GitCopy < Capistrano::SCM
 
