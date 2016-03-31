@@ -3,6 +3,7 @@ load File.expand_path('../tasks/gitcopy.rake', __FILE__)
 require 'capistrano/scm'
 
 set_if_empty :repo_path, -> { "/tmp/#{fetch(:application)}-repository" }
+set_if_empty :local_path, -> { "~/tmp/#{fetch(:application)}-repository/#{Time.now.to_i}" }
 
 class Capistrano::GitCopy < Capistrano::SCM
 
@@ -15,19 +16,17 @@ class Capistrano::GitCopy < Capistrano::SCM
 
   module DefaultStrategy
 
-    def test
-      test! " [ -f #{repo_path}/HEAD ] "
-    end
-
     def check
       git :'ls-remote --heads', repo_url
     end
 
     def clone
+      local_path = fetch(:local_path)
+
       if (depth = fetch(:git_shallow_clone))
-        git :clone, '--verbose', '--mirror', '--depth', depth, '--no-single-branch', repo_url, repo_path
+        git :clone, '--verbose', '--mirror', '--depth', depth, '--no-single-branch', repo_url, local_path
       else
-        git :clone, '--verbose', '--mirror', repo_url, repo_path
+        git :clone, '--verbose', '--mirror', repo_url, local_path
       end
     end
 
@@ -49,11 +48,7 @@ class Capistrano::GitCopy < Capistrano::SCM
     end
 
     def remote_tarfile
-      if (remote_tmp_dir = fetch(:remote_tmp_dir))
-      "#{fetch(:remote_tmp_dir)}/#{fetch(:application)}-#{fetch(:current_revision).strip}.tar.gz"
-      else
       "#{fetch(:tmp_dir)}/#{fetch(:application)}-#{fetch(:current_revision).strip}.tar.gz"
-      end
     end
 
     def release
@@ -65,6 +60,6 @@ class Capistrano::GitCopy < Capistrano::SCM
         git :archive, fetch(:branch), '--format', 'tar', "|gzip > #{local_tarfile}"
       end
     end
-  end 
+  end
 
 end

@@ -15,16 +15,17 @@ namespace :gitcopy do
   task :wrapper do
     run_locally do
       execute :mkdir, "-p", "#{fetch(:tmp_dir)}/#{fetch(:application)}/"
+
       File.open("#{fetch(:tmp_dir)}/#{fetch(:application)}/git-ssh.sh", "w") do |file|
         file.write ("#!/bin/sh -e\nexec /usr/bin/ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no \"$@\"\n")
       end
+
       execute :chmod, "+x", "#{fetch(:tmp_dir)}/#{fetch(:application)}/git-ssh.sh"
     end
   end
 
   desc 'Check that the repository is reachable'
   task :check => :'gitcopy:wrapper' do
-    fetch(:branch)
     run_locally do
       with fetch(:git_environmental_variables) do
         strategy.check
@@ -34,15 +35,14 @@ namespace :gitcopy do
 
   desc 'Clone the repo to the cache'
   task :clone => :'gitcopy:wrapper' do
+    local_path = fetch(:local_path)
+
     run_locally do
-      execute :mkdir, '-p', repo_path
-      if strategy.test
-        info t(:mirror_exists, at: repo_path)
-      else
-        within repo_path do
-          with fetch(:git_environmental_variables) do
-            strategy.clone
-          end
+      execute :mkdir, '-p', local_path
+
+      within local_path do
+        with fetch(:git_environmental_variables) do
+          strategy.clone
         end
       end
     end
@@ -50,8 +50,10 @@ namespace :gitcopy do
 
   desc 'Update the repo mirror to reflect the origin state'
   task :update => :'gitcopy:clone' do
+    local_path = fetch(:local_path)
+
     run_locally do
-      within repo_path do
+      within local_path do
         with fetch(:git_environmental_variables) do
           strategy.update
         end
@@ -61,8 +63,10 @@ namespace :gitcopy do
 
   desc 'Create tarfile'
   task :create_tarfile => [:'gitcopy:update', :'gitcopy:set_current_revision'] do
+    local_path = fetch(:local_path)
+
     run_locally do
-      within repo_path do
+      within local_path do
         with fetch(:git_environmental_variables) do
           strategy.release
         end

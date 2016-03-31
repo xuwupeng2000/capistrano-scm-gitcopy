@@ -19,15 +19,6 @@ module Capistrano
     let(:context) { Class.new.new }
     subject { Capistrano::GitCopy.new(context, Capistrano::GitCopy::DefaultStrategy) }
 
-    describe "#test" do
-      it "should call test for repo HEAD" do
-        context.expects(:repo_path).returns("/path/to/repo")
-        context.expects(:test).with " [ -f /path/to/repo/HEAD ] "
-
-        subject.test
-      end
-    end
-
     describe "#check" do
       it "should test the repo url" do
         context.expects(:repo_url).returns(:url)
@@ -40,19 +31,19 @@ module Capistrano
     describe "#clone" do
       it "should run git clone" do
         context.expects(:fetch).with(:git_shallow_clone).returns(nil)
+        context.expects(:fetch).with(:local_path).returns(:local_path)
         context.expects(:repo_url).returns(:url)
-        context.expects(:repo_path).returns(:path)
-        context.expects(:execute).with(:git, :clone, '--verbose', '--mirror', :url, :path)
+        context.expects(:execute).with(:git, :clone, '--verbose', '--mirror', :url, :local_path)
 
         subject.clone
       end
 
       it "should run git clone in shallow mode" do
         context.expects(:fetch).with(:git_shallow_clone).returns('1')
+        context.expects(:fetch).with(:local_path).returns(:local_path)
         context.expects(:repo_url).returns(:url)
-        context.expects(:repo_path).returns(:path)
 
-        context.expects(:execute).with(:git, :clone, '--verbose', '--mirror', "--depth", '1', '--no-single-branch', :url, :path)
+        context.expects(:execute).with(:git, :clone, '--verbose', '--mirror', "--depth", '1', '--no-single-branch', :url, :local_path)
 
         subject.clone
       end
