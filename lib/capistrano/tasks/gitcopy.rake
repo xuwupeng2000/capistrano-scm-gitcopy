@@ -95,9 +95,13 @@ namespace :gitcopy do
 
   desc 'Determine the revision that will be deployed'
   task :set_current_revision do
+    local_path = fetch(:local_path)
+
     run_locally do
-      with fetch(:git_environmental_variables) do
-        set :current_revision, strategy.fetch_revision
+      within local_path do
+        with fetch(:git_environmental_variables) do
+          set :current_revision, strategy.fetch_revision
+        end
       end
     end
   end
