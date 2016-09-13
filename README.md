@@ -11,6 +11,11 @@ This will make Capistrano tar the a specific git branch, upload it to the server
 
 Release notes
 ============
+0.1.5
+- local_path is now configurable
+- Use Git Revison as the name of tar file, also keep a proper revisions.log
+- Add possibility to have tmp_dir_remote
+
 0.1.4
 - Tidy up
 - New local tmp folder (/tmp/application-name/timestamp) so you can deploy without worry about clearup
