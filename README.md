@@ -7,6 +7,10 @@ A copy strategy for Capistrano 3, which mimics the `:copy` scm of Capistrano 2.
 This Gem is inspired by and based on https://github.com/wercker/capistrano-scm-copy.
 Thank wercker so much.
 
+Why you should use this gem?
+- no need to add id_rsa.pub to all your servers to deploy your remote code
+- just add this gem and use your deploy service (your laptop) read from repo and deploy to your servers
+
 This will make Capistrano tar the a specific git branch, upload it to the server(s) and then extract it in the release directory.
 
 Release notes
@@ -49,10 +53,12 @@ Then switch the `:scm` option to `:gitcopy` in `config/deploy.rb`:
 
 Finally, DO NOT ADD `require 'capistrano/gitcopy'` to `Capfile` because `capistrano/setup` already loads the scm module with the :scm value you specified.
 
+There is no default branch, you have to pass the branch you want to deploy as argument in the command line.
+
 
 Usage
 ============
 
 ```bash
-  cap staging deploy branch=(your release branch)
+  bundle exec cap staging deploy branch=(your release branch)
   ```
