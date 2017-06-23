@@ -80,8 +80,17 @@ namespace :gitcopy do
     on release_roles :all do
       within deploy_to do
         execute :mkdir, '-p', release_path
+        extract_option = ["--extract", "--verbose"]
+        if (tree = fetch(:repo_tree))
+          tree = tree.slice %r#^/?(.*?)/?$#, 1
+          components = tree.split("/").size
+          extract_option.concat ["--strip-components", components]
+          extract_option.concat ["--file"]
+        else
+          extract_option.concat ["--file"]
+        end
         upload! strategy.local_tarfile, strategy.remote_tarfile
-        execute :tar, '--extract --verbose --file', strategy.remote_tarfile, '--directory', release_path
+        execute :tar, *extract_option, strategy.remote_tarfile, '--directory', release_path
         execute :rm, strategy.remote_tarfile
       end
     end
