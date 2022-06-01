@@ -47,7 +47,7 @@ class Capistrano::GitCopy < Capistrano::SCM::Plugin
   end
 
   def fetch_revision
-    backend.capture(:git, "rev-list --max-count=1 --abbrev-commit --abbrev=12 #{fetch(:branch)}")
+    backend.capture(:git, "rev-list --max-count=1 #{fetch(:branch)}")
   end
 
   def local_tarfile
