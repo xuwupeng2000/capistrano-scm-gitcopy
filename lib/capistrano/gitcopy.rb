@@ -24,16 +24,16 @@ class Capistrano::GitCopy < Capistrano::SCM::Plugin
   end
 
   def check
-    git :'ls-remote --heads', repo_url
+    git :'ls-remote --heads', repo_url, fetch(:gitcopy_verbose) ? '' : '> /dev/null'
   end
 
   def clone
     local_path = fetch(:local_path)
 
     if (depth = fetch(:git_shallow_clone))
-      git :clone, '--verbose', '--mirror', '--depth', depth, '--no-single-branch', repo_url, local_path
+      git :clone, fetch(:gitcopy_verbose) ? '--verbose' : '--quiet', '--mirror', '--depth', depth, '--no-single-branch', repo_url, local_path
     else
-      git :clone, '--verbose', '--mirror', repo_url, local_path
+      git :clone, fetch(:gitcopy_verbose) ? '--verbose' : '--quiet', '--mirror', repo_url, local_path
     end
   end
 

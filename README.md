@@ -62,3 +62,9 @@ Usage
 ```bash
   bundle exec cap staging deploy branch=(your release branch)
   ```
+
+Output is quiet by default set `gitcopy_verbose` to true in order get verbose output
+
+```
+set :gitcopy_verbose, true
+```
