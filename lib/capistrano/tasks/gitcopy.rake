@@ -1,8 +1,6 @@
-namespace :gitcopy do
+strategy = self
 
-  def strategy
-    @strategy ||= Capistrano::GitCopy.new(self, fetch(:git_strategy, Capistrano::GitCopy::DefaultStrategy))
-  end
+namespace :gitcopy do
 
   set :git_environmental_variables, ->() {
     {
