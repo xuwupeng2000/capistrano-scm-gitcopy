@@ -1,8 +1,6 @@
-namespace :gitcopy do
+strategy = self
 
-  def strategy
-    @strategy ||= Capistrano::GitCopy.new(self, fetch(:git_strategy, Capistrano::GitCopy::DefaultStrategy))
-  end
+namespace :gitcopy do
 
   set :git_environmental_variables, ->() {
     {
@@ -80,7 +78,8 @@ namespace :gitcopy do
     on release_roles :all do
       within deploy_to do
         execute :mkdir, '-p', release_path
-        extract_option = ["--extract", "--verbose"]
+        extract_option = ["--extract"]
+        extract_option << '--verbose' if fetch(:gitcopy_verbose)
         if (tree = fetch(:repo_tree))
           tree = tree.slice %r#^/?(.*?)/?$#, 1
           components = tree.split("/").size
