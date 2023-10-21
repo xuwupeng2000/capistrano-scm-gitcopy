@@ -95,7 +95,7 @@ namespace :gitcopy do
     end
 
     run_locally do
-      if File.exists? strategy.local_tarfile
+      if File.exist? strategy.local_tarfile
         execute :rm, strategy.local_tarfile
       end
     end
